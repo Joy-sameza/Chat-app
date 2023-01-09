@@ -1,0 +1,140 @@
+@import url("https://fonts.cdnfonts.com/css/sf-mono");
+@import url("https://fonts.cdnfonts.com/css/inconsolata-2");
+@import url("https://fonts.cdnfonts.com/css/optinaval");
+
+:root {
+  /* Fonts */
+  --chat-font: "SF Mono", sans-serif; /* Font used on messages that are sent */
+  --fantasy-font: "OPTINaval", serif; /* For small and specific messages */
+  --main-font: "Ubuntu", sans-serif; /* Plain text font */
+  --notification-font: "Inconsolata", sans-serif; /* For any new notification */
+  --roboto: "Roboto Mono", sans-serif;
+  --century: "Century Gothic", sans-serif;
+
+  /* Colors */
+  --primary-green-clr: #35b897;
+  --primary-light-green-clr: #6febc8;
+  --primary-dark-green-clr: #008769;
+  --secondary-green-clr: #35b856;
+  --tertiary-clr: #3597b8;
+  --failed: #b83556;
+  --very-light-green: #e0fdf6;
+  --shadow: #3338;
+
+  /* Spacing */
+  --left-spacing: 3.5rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--notification-font);
+}
+
+body {
+  min-height: 100vh;
+  font-family: var(--roboto) !important;
+  overflow-x: hidden !important;
+  scroll-behavior: smooth !important;
+}
+input:not([type="checkbox"]):not([type="radio"]) {
+  width: 60% !important;
+}
+@media screen and (max-width: 425px) {
+  input:not([type="checkbox"]):not([type="radio"]) {
+    width: 100% !important;
+    padding: 0.3rem !important;
+    font-size: 0.75rem !important;
+  }
+}
+/* Rules for sizing the icon. */
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-24 {
+  font-size: 24px;
+}
+.material-icons.md-36 {
+  font-size: 36px;
+}
+.material-icons.md-48 {
+  font-size: 48px;
+}
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light {
+  color: rgba(255, 255, 255, 1);
+}
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.material-icons {
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: "liga";
+}
+.container {
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.26);
+  border-radius: 0.5rem;
+}
+.btn-primary {
+  background-color: var(--primary-green-clr) !important;
+  border: var(--primary-green-clr) !important;
+}
+.btn-secondary {
+  background-color: var(--tertiary-clr) !important;
+  border: var(--tertiary-clr) !important;
+  opacity: 2;
+}
+.form-check-input:checked {
+  background-color: var(--primary-green-clr) !important;
+  border-color: var(--primary-green-clr) !important;
+}
+input:placeholder-shown:not(.msger-input, #contactName, #contactTel) {
+  border: 3px dotted red;
+}
+input:not(:placeholder-shown):not(.msger-input, #contactName, #contactTel) {
+  border: 3px dotted var(--secondary-green-clr);
+}
+input,
+input:hover,
+input:focus,
+input:active,
+button,
+button:hover,
+button:focus,
+button:active {
+  outline: none !important;
+}
+.btn-outline-primary {
+  color: var(--primary-green-clr);
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("./partials/head.ejs") %> 
+<body style="overflow-y: hidden;" onload="getUserCookies()">
+    <div class="row mt-5">
+        <div class="col-md-6 m-auto">
+            <div class="card card-body">
+                <h1 class="text-center mb-3">
+                    <span class="material-icons md-48">
+                      login
+                    </span> Login
+                  </h1>
+                <%- include('./partials/alerts.ejs') %> 
+                <form action="/login" method="post">
+                    <div class="form-group mb-3">
+                        <label for="email">Email</label>
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          class="form-control"
+                          placeholder="name@example.com"
+                          value="<%= typeof email != 'undefined' ? email : '' %>"
+                          autocomplete="email"
+                          autofocus
+                        />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="password">Password</label>
+                        <input
+                          type="password"
+                          id="password"
+                          name="password"
+                          class="form-control"
+                          placeholder="Enter Password"
+                          value="<%= typeof password != 'undefined' ? password : '' %>"
+                          autocomplete="current-password"
+                        />
+                      </div>
+                      <div class="form-group mb-3">
+                        <div class="form-check">
+                          <label class="form-check-label">
+                            <input type="checkbox" class="form-check-input" name="remember-me" id="remember-me" value="checked">
+                            Remember Me
+                          </label>
+                        </div>
+                      </div>
+                      <button type="submit" class="btn btn-primary btn-block">
+                        Login
+                      </button>
+                </form>
+                <p class="lead mt-4">Don't Have An Account? <a href="/register">Register</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referer" content="origin">
+    <title>Chat App | <%- title %> </title>
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
+    <link rel="stylesheet" href="/css/dashboard.css" type="text/css">
+    <!-- <link rel="stylesheet" href="https://bootswatch.com/5/cyborg/bootstrap.min.css"> -->
+    <!-- <link rel="stylesheet" href="/css/css/bootstrap.min.css"> -->
+    <!-- <script src="/script/js/bootstrap.min.js" type="text/javascript"> </script> -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+  </head>
+<body>
+
+
+  <div class="side-navbar d-flex justify-content-between flex-wrap flex-column" id="sidebar">
+    <div class="list-group list-group-flush">
+      <div class="card text-primary bg-transparent card-header d-flex justify-content-between flex-row-reverse align-items-center">
+        <h2 class="lead text-dark-emphasis container-fluid text-md-center">Contacts</h2>
+        <span id="toggleSidebar2" style="display: inline-block; cursor: pointer;">&xlarr;</span>
+      </div>
+      <button type="button" class="list-group-item list-group-item-action active">
+        Cras justo odio
+      </button>
+      <button type="button" class="list-group-item list-group-item-action">Dapibus ac facilisis in</button>
+      <button type="button" class="list-group-item list-group-item-action">Morbi leo risus</button>
+      <button type="button" class="list-group-item list-group-item-action">Porta ac consectetur ac</button>
+      <button type="button" class="list-group-item list-group-item-action">Vestibulum at eros</button>
+    </div>
+
+    <button type="button" class="btn btn-primary btn-block rounded-0" data-bs-toggle="modal" data-target="#contactModal" id="openModal">
+      Add contact
+    </button>  
+  </div>
+  
+  <div class="modal fade bg-transparent" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="contactModalLabel">Create a new contact</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="contactModalForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="col-form-label mt-4" for="contactName">Contact Name</label>
+              <input type="text" class="form-control" placeholder="Marry Doe" id="contactName" name="contactName" required autocomplete="off" inputmode="latin-name">
+            </div>
+            <div class="form-group">
+              <label class="col-form-label mt-4" for="contactTel">Phone Number</label>
+              <input type="tel" class="form-control" placeholder="+237xxxxxxxxx" id="contactTel" pattern="(\+237|237)(6|2)(2|3|[5-9])[0-9]{7}" name="contactTel" required autocomplete="off" inputmode="tel">
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Create Contact</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+        </div>
+    </div>
+  </div>
+
+  <div class="p-1 my-container active-cont">
+
+    <section class="msger">
+      <div class="tel" style="display: none;"><%- tel %></div>
+      <div class="email" style="display: none;"><%- email %></div>
+    <header class="msger-header">
+      <div class="msger-header-title">
+        SimpleChat
+        <button class="btn btn-outline-dark btn-sm" id="toggleSidebar">Contact List</button>
+      </div>
+
+
+      <div class="msger-header-options">
+        <span class="lead"><%- name.split(' ')[0] %>&nbsp;&nbsp;&nbsp;</span>
+        <span><a href="/logout" class="btn btn-outline-primary">Logout</a></span>
+      </div>
+    </header>
+  
+    <main class="msger-chat">
+
+
+      <div class="msg left-msg">
+        <div class="msg-bubble">
+          <div class="msg-info">
+            <div class="msg-info-name">BOT</div>
+            <div class="msg-info-time">12:45</div>
+          </div>
+          <div class="msg-text">
+            Hi, welcome to SimpleChat! Go ahead and send me a message. 😄
+          </div>
+        </div>
+      </div>
+  
+      <div class="msg right-msg">
+        <div class="msg-bubble">
+          <div class="msg-info">
+            <div class="msg-info-name"><%- name.split(' ')[0] %></div>
+            <div class="msg-info-time">12:46&nbsp;&nbsp;<span>Read</span></div>
+          </div>
+          <div class="msg-text">
+            You can change your name in JS section!
+          </div>
+        </div>
+      </div>
+
+      
+    </main>
+  
+    <form class="msger-inputarea">
+      <input type="text" class="msger-input" placeholder="Enter your message..." autofocus>
+      <button type="submit" class="msger-send-btn">Send</button>
+    </form>
+  </section>
+  </div>
+    
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/script/dashboard.js" ></script>
+</body>
+</html>
