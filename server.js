@@ -1,6 +1,5 @@
-require('dotenv').config({ path: "./config/.env" });
-require('dotenv-vault-core').config();
-console.log(process.env)
+require("dotenv").config({ path: "./config/.env" });
+require("dotenv-vault-core").config();
 
 //Port for connection
 const port = process.env.PORT || 8080;
@@ -101,7 +100,10 @@ io.on("connection", (socket) => {
     })
     .catch((err) => console.log(err));
 
-  socket.join(id);
+  socket.on('join', con => {
+    socket.join(con.contactTel);
+    console.log(`Joined ${con.contactName}`);
+  })
 
   //Save new contacts to db
   socket.on("new-contact", (newContactArray, tel) => {
@@ -143,19 +145,30 @@ app.get("/register", (req, res) =>
   res.render("register", { title: "Register" })
 );
 app.get("/login", (req, res) => res.render("login", { title: "Login" }));
-app.get("/dasboard", ensureAuthenticated, (req, res) =>
-  res.render("dashboard", {
-    title: "Dashboard",
-    name: req.user.userName,
-    tel: req.user.telephone,
+app.get("/dasboard", ensureAuthenticated, (req, res) => {
+  User.findOne({
     email: req.user.email,
-  })
-);
+    telephone: req.user.telephone,
+  }).then((user) => {
+    console.log("User", user);
+    personContacts
+      .findOne({ userId: user._id, userContact: req.user.telephone })
+      .then((contact) => {
+        console.log(contact);
+        res.render("dashboard", {
+          title: "Dashboard",
+          name: req.user.userName,
+          tel: req.user.telephone,
+          email: req.user.email,
+          contacts: contact.contacts
+        });
+      });
+  });
+});
 app.get("/logout", (req, res) => {
   req.logout((err) => console.log(err));
   res.redirect("/login");
 });
-
 app.post("/register", (req, res) => {
   let { userName, email, telephone, password, password2 } = req.body;
   let errors = [];
@@ -176,7 +189,7 @@ app.post("/register", (req, res) => {
   }
 
   if (errors.length > 0) {
-    res.render("register", {
+    res.status(405).render("register", {
       errors,
       userName,
       email,
@@ -196,7 +209,7 @@ app.post("/register", (req, res) => {
       .then((exist) => {
         if (exist) {
           errors.push({ msg: "Email already registered" });
-          res.render("register", {
+          res.status(405).render("register", {
             errors,
             userName,
             email,
@@ -219,14 +232,14 @@ app.post("/register", (req, res) => {
                 .save()
                 .then(() => {
                   req.flash("success_msg", "You are now registered");
-                  res.redirect("/login");
+                  res.status(201).redirect("/login");
                 })
                 .catch(() => {
                   req.flash(
                     "error_msg",
                     "Problem creating your account. Please retry"
                   );
-                  res.render("register", {
+                  res.status(500).render("register", {
                     userName,
                     email,
                     telephone,
@@ -265,5 +278,4 @@ app.post("/login", (req, res, next) => {
     })(req, res, next);
   }
 });
-
 app.use((req, res) => res.status(404).render("404", { title: "Not Found" }));

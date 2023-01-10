@@ -7,7 +7,7 @@ const email = get(".email").textContent;
 const openModal = get("#openModal");
 const modal = get(".modal");
 const contacts = document.querySelectorAll(
-  "button.list-group-item.list-group-item-action"
+  "a.list-group-item.list-group-item-action"
 );
 const listContacts = get(".list-group.list-group-flush");
 const sidebar = get("#sidebar");
@@ -17,6 +17,9 @@ const contactModalForm = get("#contactModalForm");
 const contactName = get("#contactName");
 const contactTel = get("#contactTel");
 let counter = 0;
+
+//Include Websocket
+const socket = io("http://localhost:4200", { query: { tel, email } });
 
 toggleSidebar.addEventListener("click", (e) => {
   e.preventDefault();
@@ -35,9 +38,9 @@ toggleSidebar.addEventListener("click", (e) => {
       arrow = "&xrarr;";
       toggleSidebar.innerHTML += `Sidebar ${arrow}`;
       toggleSidebar.innerHTML = toggleSidebar.textContent.slice(3);
-    }
-  }, 10);
-});
+    }  
+  }, 10);  
+});  
 
 toggleSidebar2.addEventListener("click", (e) => {
   e.preventDefault();
@@ -56,9 +59,9 @@ toggleSidebar2.addEventListener("click", (e) => {
       arrow = "&xrarr;";
       toggleSidebar2.innerHTML += `Sidebar ${arrow}`;
       toggleSidebar2.innerHTML = toggleSidebar2.textContent.slice(-1);
-    }
-  }, 10);
-});
+    }  
+  }, 10);  
+});  
 
 setInterval(() => {
   if (!counter) {
@@ -66,16 +69,13 @@ setInterval(() => {
       sidebar.classList.add("active-nav");
     } else {
       sidebar.classList.remove("active-nav");
-    }
-  }
-}, 10);
+    }  
+  }  
+}, 10);  
 
 function toggleSideBar() {
   sidebar.classList.toggle("active-nav");
-}
-
-//Include Websocket
-const socket = io("http://localhost:4200", { query: { tel, email } });
+}  
 
 //Open contact modal on click
 const myModal = new bootstrap.Modal("#contactModal", {
@@ -91,9 +91,12 @@ openModal.addEventListener("click", () => {
 //Display contacts
 socket.on("saved-contacts", (cts) => {
   cts.forEach((contact) => {
-    let btn = document.createElement("button");
-    btn.setAttribute("type", "button");
-    btn.classList.add("list-group-item list-group-item-action");
+    socket.emit('join', contact);
+    let btn = document.createElement("a");
+    btn.classList.add("list-group-item");
+    btn.classList.add("list-group-item-action");
+    btn.setAttribute("data-text", contact.contactName);
+    btn.setAttribute("style", "text-decoration: none; cursor:pointer;");
     btn.innerHTML = `${contact.contactName}<span style="display: none;">${contact.contactTel}</span>`;
 
     listContacts.appendChild(btn);
@@ -103,9 +106,9 @@ socket.on("saved-contacts", (cts) => {
 //Add listener on each btn/contact
 contacts.forEach((contact) => {
   contact.addEventListener("click", (event) => {
-    console.log(contacts);
-    let count = 0;
     event.preventDefault();
+
+    let count = 0;
     if (!contact.classList.contains("active")) {
       contacts.forEach((con) => con.classList.remove("active"));
       contact.classList.add("active");
@@ -121,6 +124,17 @@ contacts.forEach((contact) => {
     }
   });
 });
+
+contacts.forEach((contact) => {
+  contact.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (contact.classList.contains("active")) {
+      let conName = contact.lastChild.getAttribute("data-text");
+      let conTel = contact.lastChild.textContent.trim();
+      console.log(`${conName}`);
+    }
+  });
+})
 
 //Add new contact from modal form
 let newContactArray;
@@ -148,6 +162,12 @@ msgerForm.addEventListener("submit", (event) => {
   msgerInput.value = "";
 });
 
+socket.on("connect", () => console.log(socket.id, tel, window.innerWidth));
+
+socket.on("receive-message", (message) => {
+  console.log(message);
+});
+
 function sendMessage(senderId, message) {
   //   Simple solution for small apps
   const msgHTML = `
@@ -172,7 +192,7 @@ function sendMessage(senderId, message) {
   });
 
   msgerChat.insertAdjacentHTML("beforeend", msgHTML);
-  msgerChat.scrollTop += 500;
+  msgerChat.scrollTop = msgerChat.scrollHeight;
 }
 
 // Utils
@@ -225,9 +245,3 @@ function receiveMessage(message, name, senderID) {
     msgerChat.scrollTop += 500;
   }
 }
-
-socket.on("connect", () => console.log(socket.id, tel, window.innerWidth));
-
-socket.on("receive-message", (message) => {
-  console.log(message);
-});
