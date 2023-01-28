@@ -270,4 +270,5 @@ app.post("/login", (req, res, next) => {
     })(req, res, next);
   }
 });
+app.get('/health', (req, res) => res.sendStatus(200));
 app.use((req, res) => res.status(404).render("404", { title: "Not Found" }));
