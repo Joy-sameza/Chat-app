@@ -24,5 +24,13 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Joy-sameza/Chat-app.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Joy-sameza/Chat-app/issues"
+  },
+  "homepage": "https://github.com/Joy-sameza/Chat-app#readme"
 }
