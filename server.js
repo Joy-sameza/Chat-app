@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./config/.env" });
+require("dotenv").config();
 
 //Port for connection
 const port = process.env.PORT || 8080;
@@ -115,7 +115,6 @@ io.on("connection", (socket) => {
             person
               .save()
               .then((prs) => {
-                conats = prs.contacts;
                 socket.emit("saved-contacts", prs.contacts);
               })
               .catch((err) => console.log(err));
