@@ -6,9 +6,7 @@ const tel = get(".tel").textContent;
 const email = get(".email").textContent;
 const openModal = get("#openModal");
 const modal = get(".modal");
-const contacts = document.querySelectorAll(
-  "a.list-group-item.list-group-item-action"
-);
+const contacts = document.querySelectorAll("a.list-group-item.list-group-item-action");
 const listContacts = get(".list-group.list-group-flush");
 const sidebar = get("#sidebar");
 const toggleSidebar = get("#toggleSidebar");
@@ -38,9 +36,9 @@ toggleSidebar.addEventListener("click", (e) => {
       arrow = "&xrarr;";
       toggleSidebar.innerHTML += `Sidebar ${arrow}`;
       toggleSidebar.innerHTML = toggleSidebar.textContent.slice(3);
-    }  
-  }, 10);  
-});  
+    }
+  }, 10);
+});
 
 toggleSidebar2.addEventListener("click", (e) => {
   e.preventDefault();
@@ -59,9 +57,9 @@ toggleSidebar2.addEventListener("click", (e) => {
       arrow = "&xrarr;";
       toggleSidebar2.innerHTML += `Sidebar ${arrow}`;
       toggleSidebar2.innerHTML = toggleSidebar2.textContent.slice(-1);
-    }  
-  }, 10);  
-});  
+    }
+  }, 10);
+});
 
 setInterval(() => {
   if (!counter) {
@@ -69,13 +67,13 @@ setInterval(() => {
       sidebar.classList.add("active-nav");
     } else {
       sidebar.classList.remove("active-nav");
-    }  
-  }  
-}, 10);  
+    }
+  }
+}, 10);
 
 function toggleSideBar() {
   sidebar.classList.toggle("active-nav");
-}  
+}
 
 //Open contact modal on click
 const myModal = new bootstrap.Modal("#contactModal", {
@@ -91,12 +89,17 @@ openModal.addEventListener("click", () => {
 //Display contacts
 socket.on("saved-contacts", (cts) => {
   cts.forEach((contact) => {
-    socket.emit('join', contact);
+    let conactPrivateRoom = contact.contactTel + tel;
+    let roomPrivate = tel + contact.contactTel;
     let btn = document.createElement("a");
     btn.classList.add("list-group-item");
     btn.classList.add("list-group-item-action");
     btn.setAttribute("data-text", contact.contactName);
     btn.setAttribute("style", "text-decoration: none; cursor:pointer;");
+    btn.addEventListener("click", () => {
+      socket.emit("join", conactPrivateRoom);
+      socket.emit("join", roomPrivate);
+    });
     btn.innerHTML = `${contact.contactName}<span style="display: none;">${contact.contactTel}</span>`;
 
     listContacts.appendChild(btn);
@@ -107,11 +110,14 @@ socket.on("saved-contacts", (cts) => {
 contacts.forEach((contact) => {
   contact.addEventListener("click", (event) => {
     event.preventDefault();
-
+    let contactPrivateRoom = contact;
+    let roomPrivate = "";
     let count = 0;
     if (!contact.classList.contains("active")) {
       contacts.forEach((con) => con.classList.remove("active"));
       contact.classList.add("active");
+      socket.emit("join", contactPrivateRoom, roomPrivate);
+      console.log(contactPrivateRoom, roomPrivate);
     } else {
       contacts.forEach((con) => {
         if (con.classList.contains("active")) {
@@ -125,16 +131,14 @@ contacts.forEach((contact) => {
   });
 });
 
-contacts.forEach((contact) => {
-  contact.addEventListener("click", (event) => {
+contacts.forEach((con) => {
+  con.addEventListener("click", (event) => {
     event.preventDefault();
-    if (contact.classList.contains("active")) {
-      let conName = contact.lastChild.getAttribute("data-text");
-      let conTel = contact.lastChild.textContent.trim();
-      console.log(`${conName}`);
+    if (con.classList.contains("active")) {
+      //
     }
   });
-})
+});
 
 //Add new contact from modal form
 let newContactArray;
@@ -164,11 +168,11 @@ msgerForm.addEventListener("submit", (event) => {
 
 socket.on("connect", () => console.log(socket.id, tel, window.innerWidth));
 
-socket.on("receive-message", (message) => {
-  console.log(message);
+socket.on("receive-message", ({ name, message }) => {
+  receiveMessage(message, name);
 });
 
-function sendMessage(senderId, message) {
+function sendMessage(recipients, message) {
   //   Simple solution for small apps
   const msgHTML = `
     <div class="msg right-msg">
@@ -184,11 +188,9 @@ function sendMessage(senderId, message) {
     </div>
   `;
 
-  let room = [tel];
   socket.emit("send-message", {
     message: message,
-    id: senderId,
-    recipients: room,
+    recipients,
   });
 
   msgerChat.insertAdjacentHTML("beforeend", msgHTML);
@@ -207,10 +209,8 @@ function formatDate(date) {
   return `${h.slice(-2)}:${m.slice(-2)}`;
 }
 
-function receiveMessage(message, name, senderID) {
-  if (senderID === tel) {
-    name = "You";
-    let msgDisplay = `<div class="msg right-msg">
+function receiveMessage(message, name) {
+  let msgDisplay = `<div class="msg right-msg">
   <div class="msg-bubble">
     <div class="msg-info">
       <div class="msg-info-name">${name}</div>
@@ -224,24 +224,6 @@ function receiveMessage(message, name, senderID) {
   </div>
 </div>`;
 
-    msgerChat.insertAdjacentHTML("beforeend", msgDisplay);
-    msgerChat.scrollTop += 500;
-  } else {
-    let msgDisplay = `<div class="msg right-msg">
-  <div class="msg-bubble">
-    <div class="msg-info">
-      <div class="msg-info-name">${name}</div>
-      <div class="msg-info-time">${formatDate(
-        new Date()
-      )}&nbsp;&nbsp;<span>Read</span></div>
-    </div>
-    <div class="msg-text">
-      ${message}
-    </div>
-  </div>
-</div>`;
-
-    msgerChat.insertAdjacentHTML("beforeend", msgDisplay);
-    msgerChat.scrollTop += 500;
-  }
+  msgerChat.insertAdjacentHTML("beforeend", msgDisplay);
+  msgerChat.scrollTop = msgerChat.scrollHeight;
 }

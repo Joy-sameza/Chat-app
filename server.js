@@ -1,13 +1,14 @@
 require("dotenv").config({ path: "./config/.env" });
-require("dotenv-vault-core").config();
 
 //Port for connection
 const port = process.env.PORT || 8080;
+const sessionSecret = process.env.SESSION_SECRET;
 
 const express = require("express");
 const app = express();
 const path = require("path");
 const server = require("http").createServer(app);
+const { ServerApiVersion } = require('mongodb');
 const io = require("socket.io")(server);
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
@@ -24,12 +25,11 @@ require("./config/log")(passport);
 const { ensureAuthenticated } = require("./config/auth");
 const { use } = require("passport");
 
-let conats = "";
-
 //connect to mongoDB
-const dbURI = "mongodb://localhost:27017/chatApp";
+// const dbURI = "mongodb://localhost:27017/chatApp";
+const dbURI = process.env.MONGODB_URI;
 mongoose
-  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 })
   .then(() => {
     server.listen(port, () =>
       console.log(`\nListening for request on port ${port}`)
@@ -46,7 +46,7 @@ app.use(express.urlencoded({ extended: false }));
 //Express-session middleware
 app.use(
   session({
-    secret: "secret",
+    secret: sessionSecret,
     resave: false, // don't save session if unmodified
     saveUninitialized: false, // don't create session until something stored
   })
@@ -99,12 +99,10 @@ io.on("connection", (socket) => {
       }
     })
     .catch((err) => console.log(err));
-
-  socket.on('join', con => {
-    socket.join(con.contactTel);
-    console.log(`Joined ${con.contactName}`);
-  })
-
+  socket.on("join", ({contactPrivateRoom, roomPrivate}) => {
+    socket.join(contactPrivateRoom).then(console.log(`Joined ${contactPrivateRoom}`));
+    socket.join(roomPrivate).then(console.log(`Joined ${roomPrivate}`));
+  });
   //Save new contacts to db
   socket.on("new-contact", (newContactArray, tel) => {
     const { contactName, contactTel } = newContactArray;
@@ -127,12 +125,9 @@ io.on("connection", (socket) => {
     });
   });
   socket.on("send-message", ({ recipients, message }) => {
-    recipients.forEach((recipient) => {
-      let newRecipients = recipients.filter((r) => r !== recipient);
-      newRecipients.push(id);
-      socket.broadcast.to(recipient).emit("receive-message", {
-        recipients: newRecipients,
-        sender: id,
+    User.findOne({ email: mail, telephone: id }).then((user) => {
+      socket.broadcast.to(recipients).emit("receive-message", {
+        name: user.userName,
         message: message,
       });
     });
@@ -150,17 +145,15 @@ app.get("/dasboard", ensureAuthenticated, (req, res) => {
     email: req.user.email,
     telephone: req.user.telephone,
   }).then((user) => {
-    console.log("User", user);
     personContacts
       .findOne({ userId: user._id, userContact: req.user.telephone })
       .then((contact) => {
-        console.log(contact);
         res.render("dashboard", {
           title: "Dashboard",
           name: req.user.userName,
           tel: req.user.telephone,
           email: req.user.email,
-          contacts: contact.contacts
+          contacts: contact.contacts,
         });
       });
   });

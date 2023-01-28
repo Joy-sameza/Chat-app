@@ -142,9 +142,9 @@ body {
   float: left;
   width: var(--side-bar-width);
   height: 100vh;
-  margin-left: -300px;
+  margin-left: -800px;
   background: var(--msger-bg);
-  transition: all 0.2s;
+  transition: all 0.2s ease-in-out;
   overflow: hidden auto;
 }
 .my-container {
